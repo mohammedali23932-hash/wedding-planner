@@ -356,8 +356,8 @@ function IconBtn({ onClick, title, children, danger }) {
     <button
       onClick={onClick}
       title={title}
-      className="p-1.5 rounded-md transition-colors"
-      style={{ color: danger ? "#A33" : INK, opacity: 0.55 }}
+      cclassName="rounded-md transition-colors flex items-center justify-center"
+      style={{ color: danger ? "#A33" : INK, opacity: 0.55, width: 36, height: 36 }}
       onMouseEnter={(e) => (e.currentTarget.style.opacity = 1)}
       onMouseLeave={(e) => (e.currentTarget.style.opacity = 0.55)}
     >
@@ -370,7 +370,7 @@ function PrimaryBtn({ onClick, children, style = {} }) {
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-1.5 px-4 py-2 rounded-md transition-transform active:scale-[0.98]"
+      className="flex items-center gap-2.5 px-4 py-2 rounded-md transition-transform active:scale-[0.98]"
       style={{ background: WINE, color: "#fff", fontFamily: "'Work Sans', sans-serif", fontSize: 13, fontWeight: 500, ...style }}
     >
       {children}
@@ -1191,9 +1191,29 @@ function LockScreen({ onUnlock }) {
   );
 }
 
-function WeddingManager() {
-  const [unlocked, setUnlocked] = useState(false);
-  if (!unlocked) return <LockScreen onUnlock={() => setUnlocked(true)} />;
+const UNLOCK_KEY = "wedding_planner_unlocked";
+
+function getStoredUnlock() {
+  try {
+    return localStorage.getItem(UNLOCK_KEY) === "true";
+  } catch (e) {
+    return false;
+  }
+}
+
+function setStoredUnlock() {
+  try {
+    localStorage.setItem(UNLOCK_KEY, "true");
+  } catch (e) {}
+}
+
+export default function WeddingManager() {
+  const [unlocked, setUnlocked] = useState(getStoredUnlock);
+  const handleUnlock = () => {
+    setStoredUnlock();
+    setUnlocked(true);
+  };
+  if (!unlocked) return <LockScreen onUnlock={handleUnlock} />;
   return <WeddingManagerApp />;
 }
 
