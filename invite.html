@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Abdul Rahman &amp; Fatimunisa's Wedding</title>
-<meta name="description" content="Join us as we celebrate the wedding of Abdul Rahman and Fatimunisa — Haldi, Mehndi, Nikah and Walima." />
+<title>Abdul Rahman &amp; Fathimunnisa's Wedding</title>
+<meta name="description" content="Join us as we celebrate the wedding of Abdul Rahman and Fathimunnisa — Haldi, Mehndi, Nikah and Walima." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -185,8 +185,38 @@
     display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;
   }
   .gallery-grid img {
-    width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 12px;
+    width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: top; border-radius: 12px;
     border: 1px solid var(--line);
+  }
+
+  /* ---------- Quote ---------- */
+  .quote-section { text-align: center; }
+  .quote-arabic {
+    font-family: 'Noto Naskh Arabic', serif;
+    font-weight: 500;
+    font-size: clamp(20px, 3.2vw, 28px);
+    line-height: 2;
+    color: var(--wine);
+    direction: rtl;
+  }
+  .quote-translation {
+    margin-top: 14px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(18px, 2.2vw, 22px);
+    line-height: 1.6;
+    color: var(--ink);
+    opacity: 0.85;
+    max-width: 560px;
+    margin-left: auto; margin-right: auto;
+  }
+  .quote-citation {
+    margin-top: 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold);
   }
 
   /* ---------- RSVP ---------- */
@@ -258,12 +288,20 @@
     <path d="M260 45 a8 8 0 1 1 0.01 0" stroke="currentColor" stroke-width="1"/>
   </svg>
   <div class="hero-eyebrow fade-up d1">Together with their families</div>
-  <h1 class="fade-up d2"><span id="hero-p1">Abdul Rahman</span> <em>&amp;</em> <span id="hero-p2">Fatimunisa</span></h1>
+  <h1 class="fade-up d2"><span id="hero-p1">Abdul Rahman</span> <em>&amp;</em> <span id="hero-p2">Fathimunnisa</span></h1>
   <div class="hero-names fade-up d2">عَبْدُ الرَّحْمَٰنِ <em>&amp;</em> فَاطِمَةُ النِّسَاء</div>
   <div class="hero-date mono fade-up d3" id="hero-dates">18 – 21 December 2026</div>
   <div class="hero-inshallah fade-up d3">إِنْ شَاءَ اللَّهُ</div>
   <a class="hero-venue fade-up d3" id="hero-venue" href="https://maps.app.goo.gl/33m9TEmMai44iKSx5" target="_blank" rel="noreferrer">Ramesh Convention Centre / Officers Club</a>
   <a href="#rsvp" class="hero-cta fade-up d4">Reserve your spot ✓</a>
+</section>
+
+<section class="quote-section">
+  <div class="section-inner">
+    <div class="quote-arabic">هُوَ الَّذِي خَلَقَكُم مِّن نَّفْسٍ وَاحِدَةٍ وَجَعَلَ مِنْهَا زَوْجَهَا لِيَسْكُنَ إِلَيْهَا</div>
+    <p class="quote-translation">"It is He who created you from a single soul and made from it its mate that he might dwell in security with her."</p>
+    <div class="quote-citation">Surah Al-A'raf, 7:189</div>
+  </div>
 </section>
 
 <section id="story" class="story">
@@ -287,11 +325,11 @@
   <div class="section-inner">
     <div class="section-label"><span>Gallery</span></div>
     <div class="gallery-grid">
-      <img src="images/couple-1.jpg" alt="Abdul Rahman and Fatimunisa" loading="lazy" />
-      <img src="images/couple-2.jpg" alt="Abdul Rahman and Fatimunisa" loading="lazy" />
-      <img src="images/couple-3.jpg" alt="Abdul Rahman and Fatimunisa" loading="lazy" />
-      <img src="images/couple-4.jpg" alt="Abdul Rahman and Fatimunisa" loading="lazy" />
-      <img src="images/couple-5.jpg" alt="Abdul Rahman and Fatimunisa" loading="lazy" />
+      <img src="images/couple-1.jpg" alt="Abdul Rahman and Fathimunnisa" loading="lazy" />
+      <img src="images/couple-2.jpg" alt="Abdul Rahman and Fathimunnisa" loading="lazy" />
+      <img src="images/couple-3.jpg" alt="Abdul Rahman and Fathimunnisa" loading="lazy" />
+      <img src="images/couple-4.jpg" alt="Abdul Rahman and Fathimunnisa" loading="lazy" />
+      <img src="images/couple-5.jpg" alt="Abdul Rahman and Fathimunnisa" loading="lazy" />
     </div>
   </div>
 </section>
@@ -335,7 +373,7 @@
 
 <footer>
   <div class="glyph">✦</div>
-  <p class="names display">Abdul Rahman &amp; Fatimunisa</p>
+  <p class="names display">Abdul Rahman &amp; Fathimunnisa</p>
   <p>With love and gratitude for those who'll be there.</p>
 </footer>
 
@@ -348,7 +386,7 @@
     "Haldi": "A joyful turmeric ceremony to bless the couple before the big day.",
     "Mehndi": "Henna, music and dancing with family and friends.",
     "Mehndi/Haldi": "Henna, turmeric, music and dancing with family and friends.",
-    "Nikah": "The wedding ceremony, uniting Abdul Rahman and Fatimunisa in marriage.",
+    "Nikah": "The wedding ceremony, uniting Abdul Rahman and Fathimunnisa in marriage.",
     "Walima": "The wedding reception, celebrating the newlyweds with a feast."
   };
 
