@@ -180,13 +180,18 @@
   .schedule-venue a { color: var(--wine); text-decoration: none; opacity: 0.85; }
   .schedule-venue a:hover { text-decoration: underline; }
 
-  /* ---------- Gallery ---------- */
-  .gallery-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;
-  }
-  .gallery-grid img {
-    width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: top; border-radius: 12px;
+  /* ---------- Story photo ---------- */
+  .story-photo {
+    display: block;
+    width: 100%;
+    max-width: 340px;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    object-position: top;
+    border-radius: 16px;
     border: 1px solid var(--line);
+    box-shadow: 0 18px 40px -20px rgba(30, 90, 69, 0.35);
+    margin: 0 auto 28px;
   }
 
   /* ---------- Quote ---------- */
@@ -234,13 +239,6 @@
     padding: 11px 13px; outline: none; resize: vertical;
   }
   .field input:focus, .field textarea:focus { border-color: var(--wine); }
-  .attending-toggle { display: flex; gap: 10px; }
-  .attending-toggle button {
-    flex: 1; padding: 11px; border-radius: 8px; border: 1px solid var(--line);
-    background: var(--paper); font-family: 'Work Sans', sans-serif; font-size: 13.5px; color: var(--ink);
-    cursor: pointer; transition: all 0.15s;
-  }
-  .attending-toggle button.active { background: var(--wine); border-color: var(--wine); color: #fff; }
   .rsvp-submit {
     width: 100%; padding: 13px; border-radius: 8px; border: none;
     background: var(--wine); color: #fff; font-family: 'Work Sans', sans-serif;
@@ -275,7 +273,6 @@
   <a href="#home">Home</a>
   <a href="#story">Our Story</a>
   <a href="#schedule">Schedule</a>
-  <a href="#gallery">Gallery</a>
   <a href="#rsvp">RSVP</a>
 </nav>
 
@@ -307,6 +304,7 @@
 <section id="story" class="story">
   <div class="section-inner">
     <div class="section-label"><span>Our Story</span></div>
+    <img class="story-photo" src="images/couple-2.jpg" alt="Abdul Rahman and Fathimunnisa" loading="lazy" />
     <p id="story-text">We can't wait to celebrate this new chapter with the people we love most. More of our story — how it started, and how we got here — is coming soon.</p>
     <p class="placeholder-note">— This section is a placeholder. Send over your story and we'll drop it right in.</p>
   </div>
@@ -321,19 +319,6 @@
   </div>
 </section>
 
-<section id="gallery">
-  <div class="section-inner">
-    <div class="section-label"><span>Gallery</span></div>
-    <div class="gallery-grid">
-      <img src="images/couple-1.jpg" alt="Abdul Rahman and Fathimunnisa" loading="lazy" />
-      <img src="images/couple-2.jpg" alt="Abdul Rahman and Fathimunnisa" loading="lazy" />
-      <img src="images/couple-3.jpg" alt="Abdul Rahman and Fathimunnisa" loading="lazy" />
-      <img src="images/couple-4.jpg" alt="Abdul Rahman and Fathimunnisa" loading="lazy" />
-      <img src="images/couple-5.jpg" alt="Abdul Rahman and Fathimunnisa" loading="lazy" />
-    </div>
-  </div>
-</section>
-
 <section id="rsvp">
   <div class="section-inner">
     <div class="section-label"><span>RSVP</span></div>
@@ -342,13 +327,6 @@
         <div class="field">
           <label for="rsvp-name">Full name</label>
           <input id="rsvp-name" type="text" required placeholder="Your name" />
-        </div>
-        <div class="field">
-          <label>Will you be joining us?</label>
-          <div class="attending-toggle">
-            <button type="button" id="btn-yes" class="active" data-value="true">Joyfully accept</button>
-            <button type="button" id="btn-no" data-value="false">Regretfully decline</button>
-          </div>
         </div>
         <div class="field" id="guest-count-field">
           <label for="rsvp-count">Number of guests (including you)</label>
@@ -442,18 +420,7 @@
   }
   loadSettings();
 
-  let attending = true;
-  const btnYes = document.getElementById("btn-yes");
-  const btnNo = document.getElementById("btn-no");
-  const guestCountField = document.getElementById("guest-count-field");
-  function setAttending(val) {
-    attending = val;
-    btnYes.classList.toggle("active", val);
-    btnNo.classList.toggle("active", !val);
-    guestCountField.style.display = val ? "flex" : "none";
-  }
-  btnYes.addEventListener("click", () => setAttending(true));
-  btnNo.addEventListener("click", () => setAttending(false));
+  const attending = true;
 
   const form = document.getElementById("rsvp-form");
   const errorEl = document.getElementById("rsvp-error");
