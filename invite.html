@@ -7,7 +7,7 @@
 <meta name="description" content="Join us as we celebrate the wedding of Abdul Rahman and Fathimunnisa — Haldi, Mehndi, Nikah and Walima." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Playfair+Display:ital,wght@1,600;1,700&family=Noto+Naskh+Arabic:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --ink: #2A2419;
@@ -43,13 +43,11 @@
     text-align: center;
     padding: 16px 20px 14px;
   }
-  .bismillah-arabic {
-    font-family: 'Noto Naskh Arabic', serif;
-    font-weight: 700;
-    font-size: clamp(22px, 4vw, 34px);
-    line-height: 1.9;
-    direction: rtl;
-    unicode-bidi: isolate;
+  .bismillah-img {
+    display: block;
+    height: clamp(30px, 5.5vw, 48px);
+    width: auto;
+    margin: 0 auto;
   }
   .bismillah-translation {
     margin-top: 5px;
@@ -91,34 +89,36 @@
     background-size: cover;
     background-position: center 25%;
   }
-  .hero-names {
-    margin-top: 6px;
-    font-family: 'Noto Naskh Arabic', serif;
-    font-weight: 500;
-    font-size: clamp(15px, 2.2vw, 19px);
-    color: var(--wine);
-    opacity: 0.85;
-    direction: rtl;
+  .hero-names-img {
+    display: block;
+    height: clamp(22px, 3.6vw, 32px);
+    width: auto;
+    margin: 4px auto 0;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.25));
   }
   .hero-ornament { width: min(320px, 70vw); height: auto; color: var(--gold); opacity: 0.9; }
   .hero-eyebrow {
     font-size: 12px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--wine); opacity: 0.85;
   }
   .hero h1 {
-    font-size: clamp(48px, 10vw, 92px); font-weight: 600; line-height: 1.05; color: var(--ink);
+    font-family: 'Cinzel', serif;
+    font-size: clamp(38px, 8vw, 76px); font-weight: 700; line-height: 1.15;
+    letter-spacing: 0.01em;
+    background: linear-gradient(180deg, #F5DFA0 0%, #D4AF37 35%, #E5C158 60%, #B8860B 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.25));
   }
-  .hero h1 em { color: var(--gold); font-style: italic; }
+  .hero h1 em { font-family: 'Playfair Display', serif; font-weight: 600; font-style: italic; }
   .hero-date {
     font-size: clamp(16px, 2.4vw, 20px); letter-spacing: 0.06em; color: var(--wine); font-weight: 500;
   }
   .hero-venue { font-size: 14px; opacity: 0.7; color: var(--ink); text-decoration: none; border-bottom: 1px dotted var(--ink); }
   .hero-venue:hover { color: var(--wine); border-color: var(--wine); }
-  .hero-inshallah {
-    font-family: 'Noto Naskh Arabic', serif;
-    font-weight: 700;
-    font-size: clamp(15px, 2vw, 18px);
-    color: var(--wine);
-    direction: rtl;
+  .hero-inshallah-img {
+    display: block;
+    height: clamp(20px, 3.2vw, 28px);
+    width: auto;
+    margin: 0 auto;
   }
   .hero-cta {
     margin-top: 12px; display: inline-flex; align-items: center; gap: 8px;
@@ -278,7 +278,7 @@
 <body>
 
 <div class="bismillah-band">
-  <div class="bismillah-arabic">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+  <img class="bismillah-img" src="images/bismillah-calligraphy.png" alt="Bismillah — In the name of Allah, the Most Gracious, the Most Merciful" />
   <div class="bismillah-translation">In the name of Allah, the Most Gracious, the Most Merciful</div>
 </div>
 
@@ -299,9 +299,9 @@
   </svg>
   <div class="hero-eyebrow fade-up d1">Together with their families</div>
   <h1 class="fade-up d2"><span id="hero-p1">Abdul Rahman</span> <em>weds</em> <span id="hero-p2">Fathimunnisa</span></h1>
-  <div class="hero-names fade-up d2">عَبْدُ الرَّحْمَٰنِ وَ فَاطِمَةُ النِّسَاء</div>
+  <img class="hero-names-img fade-up d2" src="images/names-calligraphy.png" alt="Abdul Rahman and Fathimunnisa" />
   <div class="hero-date mono fade-up d3" id="hero-dates">18 – 21 December 2026</div>
-  <div class="hero-inshallah fade-up d3">إِنْ شَاءَ اللَّهُ</div>
+  <img class="hero-inshallah-img fade-up d3" src="images/inshallah-calligraphy.png" alt="InshaAllah" />
   <a class="hero-venue fade-up d3" id="hero-venue" href="https://maps.app.goo.gl/33m9TEmMai44iKSx5" target="_blank" rel="noreferrer">Ramesh Convention Centre / Officers Club</a>
   <a href="#rsvp" class="hero-cta fade-up d4">Reserve your spot ✓</a>
 </section>
