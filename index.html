@@ -792,13 +792,19 @@ function Budget({ tasks, contacts, payments, savePayments, setTab }) {
 
   const paymentsFor = (taskId) => payments.filter((p) => p.taskId === taskId);
   const advancePaid = (taskId) => paymentsFor(taskId).reduce((s, p) => s + (Number(p.amount) || 0), 0);
+  // Most tasks only ever get a number in "Estimated" and never get updated once the
+  // real price is known — so everywhere we show/total a cost, treat Actual as the
+  // real price when it's set, and quietly fall back to Estimated otherwise (flagged
+  // as "(est.)") instead of showing a misleading ₹0.
   const costBasis = (t) => (Number(t.actual) || Number(t.estimated) || 0);
+  const isEstimateOnly = (t) => !(Number(t.actual) > 0) && Number(t.estimated) > 0;
   const balanceDue = (t) => costBasis(t) - advancePaid(t.id);
 
   const totalEst = lineItems.reduce((s, t) => s + (Number(t.estimated) || 0), 0);
-  const totalAct = lineItems.reduce((s, t) => s + (Number(t.actual) || 0), 0);
+  const totalAct = lineItems.reduce((s, t) => s + costBasis(t), 0);
   const totalAdvance = lineItems.reduce((s, t) => s + advancePaid(t.id), 0);
   const totalBalance = lineItems.reduce((s, t) => s + balanceDue(t), 0);
+  const anyEstimateOnly = lineItems.some(isEstimateOnly);
 
   const toggleExpand = (id) => {
     setExpanded(expanded === id ? null : id);
@@ -818,7 +824,7 @@ function Budget({ tasks, contacts, payments, savePayments, setTab }) {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
         {[
           { label: "Estimated", value: money(totalEst), icon: Wallet, color: INK },
-          { label: "Actual", value: money(totalAct), icon: Wallet, color: totalAct > totalEst ? "#A33" : WINE },
+          { label: "Actual", value: money(totalAct), icon: Wallet, color: totalAct > totalEst ? "#A33" : WINE, sub: anyEstimateOnly ? "includes estimates" : null },
           { label: "Advance paid", value: money(totalAdvance), icon: Coins, color: SAGE },
           { label: "Balance due", value: money(totalBalance), icon: Scale, color: totalBalance > 0 ? "#A33" : SAGE },
         ].map((s) => (
@@ -828,6 +834,7 @@ function Budget({ tasks, contacts, payments, savePayments, setTab }) {
               <span style={{ fontFamily: "'Work Sans', sans-serif", fontSize: 11, opacity: 0.5, textTransform: "uppercase", letterSpacing: "0.05em" }}>{s.label}</span>
             </div>
             <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 18, fontWeight: 600, color: s.color }}>{s.value}</div>
+            {s.sub && <div style={{ fontFamily: "'Work Sans', sans-serif", fontSize: 10, color: INK, opacity: 0.4 }}>{s.sub}</div>}
           </div>
         ))}
       </div>
@@ -885,7 +892,9 @@ function Budget({ tasks, contacts, payments, savePayments, setTab }) {
                       </div>
                       <div className="flex flex-col items-end">
                         <span style={{ fontFamily: "'Work Sans', sans-serif", fontSize: 9, color: INK, opacity: 0.4, textTransform: "uppercase", letterSpacing: "0.04em" }}>Actual</span>
-                        <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, color: WINE, fontWeight: 600 }}>{money(t.actual)}</span>
+                        <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, color: isEstimateOnly(t) ? INK : WINE, opacity: isEstimateOnly(t) ? 0.6 : 1, fontWeight: 600 }}>
+                          {money(costBasis(t))}{isEstimateOnly(t) && <span style={{ fontWeight: 400, fontSize: 10 }}> (est.)</span>}
+                        </span>
                       </div>
                       <div className="flex flex-col items-end">
                         <span style={{ fontFamily: "'Work Sans', sans-serif", fontSize: 9, color: INK, opacity: 0.4, textTransform: "uppercase", letterSpacing: "0.04em" }}>Balance</span>
