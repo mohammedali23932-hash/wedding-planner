@@ -7,16 +7,16 @@
 <meta name="description" content="Join us as we celebrate the wedding of Zia and Nisa — Haldi, Mehndi, Nikah and Walima." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --ink: #2B2620;
-    --wine: #7C2D3B;
-    --sage: #7C8B6F;
-    --gold: #B08D4F;
-    --paper: #FBF8F3;
+    --ink: #2A2419;
+    --wine: #1E5A45;
+    --sage: #A9765C;
+    --gold: #C7A252;
+    --paper: #FAF6EC;
     --card: #FFFFFF;
-    --line: #E8E1D5;
+    --line: #E6DCC0;
   }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
@@ -36,12 +36,34 @@
 
   a { color: var(--wine); }
 
+  /* ---------- Bismillah ---------- */
+  .bismillah-band {
+    background: var(--wine);
+    color: var(--gold);
+    text-align: center;
+    padding: 16px 20px 14px;
+  }
+  .bismillah-arabic {
+    font-family: 'Amiri', serif;
+    font-size: clamp(20px, 3.6vw, 30px);
+    line-height: 1.5;
+    direction: rtl;
+  }
+  .bismillah-translation {
+    margin-top: 5px;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(250, 246, 236, 0.75);
+  }
+
   /* ---------- Nav ---------- */
   nav {
     position: sticky; top: 0; z-index: 20;
     display: flex; align-items: center; justify-content: center; gap: clamp(16px, 4vw, 40px);
     padding: 16px 20px;
-    background: rgba(251, 248, 243, 0.9);
+    background: rgba(250, 246, 236, 0.92);
     backdrop-filter: blur(6px);
     border-bottom: 1px solid var(--line);
   }
@@ -177,6 +199,11 @@
 </head>
 <body>
 
+<div class="bismillah-band">
+  <div class="bismillah-arabic">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+  <div class="bismillah-translation">In the name of Allah, the Most Gracious, the Most Merciful</div>
+</div>
+
 <nav>
   <a href="#home">Home</a>
   <a href="#story">Our Story</a>
@@ -187,8 +214,8 @@
 <section id="home" class="hero">
   <svg class="hero-ornament fade-up" viewBox="0 0 320 90" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <path d="M10 45 C 60 10, 110 10, 160 45 C 210 80, 260 80, 310 45" stroke="currentColor" stroke-width="1.2"/>
-    <circle cx="160" cy="45" r="5" fill="currentColor"/>
-    <circle cx="160" cy="45" r="10" stroke="currentColor" stroke-width="1"/>
+    <path d="M152 37 L168 37 L168 53 L152 53 Z" stroke="currentColor" stroke-width="1"/>
+    <path d="M160 34 L171 45 L160 56 L149 45 Z" stroke="currentColor" stroke-width="1"/>
     <path d="M60 45 a8 8 0 1 1 0.01 0" stroke="currentColor" stroke-width="1"/>
     <path d="M260 45 a8 8 0 1 1 0.01 0" stroke="currentColor" stroke-width="1"/>
   </svg>
@@ -244,7 +271,7 @@
         <button type="submit" class="rsvp-submit" id="rsvp-submit">Send RSVP</button>
       </form>
       <div class="thankyou" id="rsvp-thanks" hidden>
-        <div class="thankyou-glyph">♥</div>
+        <div class="thankyou-glyph">✦</div>
         <h3>Thank you!</h3>
         <p>Your RSVP has been received. We can't wait to celebrate with you.</p>
       </div>
