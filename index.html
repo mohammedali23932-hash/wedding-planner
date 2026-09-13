@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Zia & Nisa — Wedding Planner</title>
+<title>Abdul Rahman & Fatimunisa — Wedding Planner</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@500;700&family=Cormorant+Garamond:wght@500;600;700&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com/3.4.17"></script>
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -76,7 +76,7 @@ const Coins = makeIcon("🪙");
 const Scale = makeIcon("⚖");
 
 
-const FONT_IMPORT = `@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');`;
+const FONT_IMPORT = `@import url('https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@500;700&family=Cormorant+Garamond:wght@500;600;700&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');`;
 
 const INK = "#2B2620";
 const WINE = "#7C2D3B";
@@ -1275,8 +1275,9 @@ function LockScreen({ onUnlock }) {
           <Lock size={22} color={WINE} strokeWidth={1.75} />
         </div>
         <div className="text-center">
-          <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 26, fontWeight: 700, color: INK }}>Zia <span style={{ color: GOLD }}>&</span> Nisa</h1>
-          <p style={{ fontFamily: "'Work Sans', sans-serif", fontSize: 12, color: INK, opacity: 0.55, marginTop: 2 }}>Enter the family passcode to continue</p>
+          <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 26, fontWeight: 700, color: INK }}>Abdul Rahman <span style={{ color: GOLD }}>&</span> Fatimunisa</h1>
+          <p dir="rtl" style={{ fontFamily: "'Noto Naskh Arabic', serif", fontSize: 15, fontWeight: 500, color: WINE, opacity: 0.85, marginTop: 4 }}>عَبْدُ الرَّحْمَٰنِ <span style={{ color: GOLD }}>&</span> فَاطِمَةُ النِّسَاء</p>
+          <p style={{ fontFamily: "'Work Sans', sans-serif", fontSize: 12, color: INK, opacity: 0.55, marginTop: 8 }}>Enter the family passcode to continue</p>
         </div>
         <input
           type="password"

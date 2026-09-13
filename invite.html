@@ -83,6 +83,22 @@
     display: flex; flex-direction: column; align-items: center; text-align: center;
     gap: 22px;
     overflow: hidden;
+    min-height: min(560px, 80vh);
+    justify-content: center;
+    background-image:
+      linear-gradient(to bottom, rgba(250,246,236,0.5) 0%, rgba(250,246,236,0.72) 55%, var(--paper) 100%),
+      url('images/hero.jpg');
+    background-size: cover;
+    background-position: center 25%;
+  }
+  .hero-names {
+    margin-top: 6px;
+    font-family: 'Noto Naskh Arabic', serif;
+    font-weight: 500;
+    font-size: clamp(15px, 2.2vw, 19px);
+    color: var(--wine);
+    opacity: 0.85;
+    direction: rtl;
   }
   .hero-ornament { width: min(320px, 70vw); height: auto; color: var(--gold); opacity: 0.9; }
   .hero-eyebrow {
@@ -95,7 +111,8 @@
   .hero-date {
     font-size: clamp(16px, 2.4vw, 20px); letter-spacing: 0.06em; color: var(--wine); font-weight: 500;
   }
-  .hero-venue { font-size: 14px; opacity: 0.6; }
+  .hero-venue { font-size: 14px; opacity: 0.7; color: var(--ink); text-decoration: none; border-bottom: 1px dotted var(--ink); }
+  .hero-venue:hover { color: var(--wine); border-color: var(--wine); }
   .hero-inshallah {
     font-family: 'Noto Naskh Arabic', serif;
     font-weight: 700;
@@ -159,7 +176,18 @@
   .schedule-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--gold); margin-top: 7px; }
   .schedule-name { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 600; }
   .schedule-desc { font-size: 13.5px; opacity: 0.6; margin-top: 3px; line-height: 1.6; }
-  .schedule-venue { font-size: 12.5px; opacity: 0.5; margin-top: 6px; }
+  .schedule-venue { font-size: 12.5px; opacity: 0.6; margin-top: 6px; }
+  .schedule-venue a { color: var(--wine); text-decoration: none; opacity: 0.85; }
+  .schedule-venue a:hover { text-decoration: underline; }
+
+  /* ---------- Gallery ---------- */
+  .gallery-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;
+  }
+  .gallery-grid img {
+    width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 12px;
+    border: 1px solid var(--line);
+  }
 
   /* ---------- RSVP ---------- */
   .rsvp-card {
@@ -217,6 +245,7 @@
   <a href="#home">Home</a>
   <a href="#story">Our Story</a>
   <a href="#schedule">Schedule</a>
+  <a href="#gallery">Gallery</a>
   <a href="#rsvp">RSVP</a>
 </nav>
 
@@ -230,9 +259,10 @@
   </svg>
   <div class="hero-eyebrow fade-up d1">Together with their families</div>
   <h1 class="fade-up d2"><span id="hero-p1">Abdul Rahman</span> <em>&amp;</em> <span id="hero-p2">Fatimunisa</span></h1>
+  <div class="hero-names fade-up d2">عَبْدُ الرَّحْمَٰنِ <em>&amp;</em> فَاطِمَةُ النِّسَاء</div>
   <div class="hero-date mono fade-up d3" id="hero-dates">18 – 21 December 2026</div>
   <div class="hero-inshallah fade-up d3">إِنْ شَاءَ اللَّهُ</div>
-  <div class="hero-venue fade-up d3" id="hero-venue">Ramesh Convention Centre / Officers Club</div>
+  <a class="hero-venue fade-up d3" id="hero-venue" href="https://maps.app.goo.gl/33m9TEmMai44iKSx5" target="_blank" rel="noreferrer">Ramesh Convention Centre / Officers Club</a>
   <a href="#rsvp" class="hero-cta fade-up d4">Reserve your spot ✓</a>
 </section>
 
@@ -249,6 +279,19 @@
     <div class="section-label"><span>Celebration Schedule</span></div>
     <div class="schedule-list" id="schedule-list">
       <p style="text-align:center; opacity:0.5; font-size:13px;">Loading schedule…</p>
+    </div>
+  </div>
+</section>
+
+<section id="gallery">
+  <div class="section-inner">
+    <div class="section-label"><span>Gallery</span></div>
+    <div class="gallery-grid">
+      <img src="images/couple-1.jpg" alt="Abdul Rahman and Fatimunisa" loading="lazy" />
+      <img src="images/couple-2.jpg" alt="Abdul Rahman and Fatimunisa" loading="lazy" />
+      <img src="images/couple-3.jpg" alt="Abdul Rahman and Fatimunisa" loading="lazy" />
+      <img src="images/couple-4.jpg" alt="Abdul Rahman and Fatimunisa" loading="lazy" />
+      <img src="images/couple-5.jpg" alt="Abdul Rahman and Fatimunisa" loading="lazy" />
     </div>
   </div>
 </section>
@@ -309,6 +352,11 @@
     "Walima": "The wedding reception, celebrating the newlyweds with a feast."
   };
 
+  const DEFAULT_VENUE = { name: "Ramesh Convention Centre", mapsUrl: "https://maps.app.goo.gl/33m9TEmMai44iKSx5" };
+  const VENUE_BY_FUNCTION = {
+    "Walima": { name: "Rail Club Kalyana Mandapam (Officers Club)", mapsUrl: "https://maps.app.goo.gl/MM9McVMv8NmmJRa67" }
+  };
+
   function formatDate(d) {
     if (!d) return "";
     const dt = new Date(d + "T00:00:00");
@@ -333,17 +381,20 @@
         document.getElementById("hero-dates").textContent = functions.length > 1 ? `${first} – ${last}` : first;
 
         const list = document.getElementById("schedule-list");
-        list.innerHTML = functions.map(f => `
+        list.innerHTML = functions.map(f => {
+          const venue = VENUE_BY_FUNCTION[f.name] || DEFAULT_VENUE;
+          return `
           <div class="schedule-item">
             <div class="schedule-date mono">${formatDate(f.date)}</div>
             <div class="schedule-dot-col"><div class="schedule-dot"></div></div>
             <div>
               <div class="schedule-name display">${f.name}</div>
               <div class="schedule-desc">${FUNCTION_INFO[f.name] || "Details to follow."}</div>
-              <div class="schedule-venue">${info.venue || ""}</div>
+              <div class="schedule-venue"><a href="${venue.mapsUrl}" target="_blank" rel="noreferrer">${venue.name} — Get directions</a></div>
             </div>
           </div>
-        `).join("");
+        `;
+        }).join("");
       } else {
         document.getElementById("schedule-list").innerHTML = '<p style="text-align:center; opacity:0.5; font-size:13px;">Schedule coming soon.</p>';
       }
