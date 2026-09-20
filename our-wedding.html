@@ -211,7 +211,7 @@
   .story-photo-frame {
     width: 100%;
     max-width: 340px;
-    aspect-ratio: 800 / 960;
+    aspect-ratio: 1000 / 980;
     margin: 0 auto 28px;
     padding: 5px;
     background: linear-gradient(160deg, var(--gold), var(--bronze));
@@ -348,8 +348,8 @@
     transition: transform 1.5s cubic-bezier(.68,.02,.24,1);
     backface-visibility: hidden;
   }
-  .book-cover-left { left: 0; transform-origin: right center; border-right: 1px solid rgba(199,162,82,0.55); }
-  .book-cover-right { right: 0; transform-origin: left center; border-left: 1px solid rgba(199,162,82,0.55); }
+  .book-cover-left { left: 0; transform-origin: left center; border-right: 1px solid rgba(199,162,82,0.55); }
+  .book-cover-right { right: 0; transform-origin: right center; border-left: 1px solid rgba(199,162,82,0.55); }
   .book-cover-seam {
     position: absolute; top: 6%; bottom: 6%; left: 50%; width: 1px;
     background: rgba(199,162,82,0.5); transition: opacity 0.4s ease;
@@ -364,8 +364,8 @@
     font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 0.18em;
     text-transform: uppercase; color: var(--gold); opacity: 0.85; white-space: nowrap;
   }
-  #book-intro.opening .book-cover-left { transform: rotateY(-100deg); }
-  #book-intro.opening .book-cover-right { transform: rotateY(100deg); }
+  #book-intro.opening .book-cover-left { transform: rotateY(100deg); }
+  #book-intro.opening .book-cover-right { transform: rotateY(-100deg); }
   #book-intro.opening .book-cover-seam { opacity: 0; }
   #book-intro.opening .book-cover-content { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
   @media (prefers-reduced-motion: reduce) {
