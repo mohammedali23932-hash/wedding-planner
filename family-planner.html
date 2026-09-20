@@ -118,21 +118,97 @@ function money(n) {
 // ---------- Supabase connection ----------
 const SUPABASE_URL = "https://cqzaehjqwvxeyrhhksgb.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_FkDiU5XPBwhqOAoNouK76A_AB_B9g5V";
+const FAMILY_EMAIL = "family@ziaandnisa.wedding";
 
-const sbHeaders = {
-  apikey: SUPABASE_ANON_KEY,
-  "Content-Type": "application/json",
-};
+// ---------- Auth session (real login behind the passcode box) ----------
+const SESSION_KEY = "wedding_planner_session";
+
+function loadSession() {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+}
+function storeSession(session) {
+  try {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  } catch (e) {
+    // localStorage unavailable (e.g. private browsing) — session won't persist across reloads
+  }
+}
+function clearSession() {
+  try {
+    localStorage.removeItem(SESSION_KEY);
+  } catch (e) {}
+}
+function toSession(tokenResponse) {
+  return {
+    access_token: tokenResponse.access_token,
+    refresh_token: tokenResponse.refresh_token,
+    expires_at: Date.now() + tokenResponse.expires_in * 1000,
+  };
+}
+
+// Attempts a real sign-in against Supabase Auth. Returns the session on success, null on bad passcode.
+async function signIn(password) {
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+    method: "POST",
+    headers: { apikey: SUPABASE_ANON_KEY, "Content-Type": "application/json" },
+    body: JSON.stringify({ email: FAMILY_EMAIL, password }),
+  });
+  if (!res.ok) return null;
+  const session = toSession(await res.json());
+  storeSession(session);
+  return session;
+}
+
+async function refreshSession(refresh_token) {
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+    method: "POST",
+    headers: { apikey: SUPABASE_ANON_KEY, "Content-Type": "application/json" },
+    body: JSON.stringify({ refresh_token }),
+  });
+  if (!res.ok) return null;
+  const session = toSession(await res.json());
+  storeSession(session);
+  return session;
+}
+
+// Returns a valid access token for the signed-in family account, refreshing it if it's
+// about to expire. Returns null if there's no session (locked) or it can no longer be refreshed.
+async function getAccessToken() {
+  let session = loadSession();
+  if (!session) return null;
+  if (session.expires_at - Date.now() < 60000) {
+    session = await refreshSession(session.refresh_token);
+    if (!session) {
+      clearSession();
+      return null;
+    }
+  }
+  return session.access_token;
+}
+
+async function authHeaders() {
+  const token = await getAccessToken();
+  return {
+    apikey: SUPABASE_ANON_KEY,
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+}
 
 async function sbGet(table) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?select=*`, { headers: sbHeaders });
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?select=*`, { headers: await authHeaders() });
   if (!res.ok) throw new Error(`Failed to load ${table}`);
   return res.json();
 }
 async function sbInsert(table, row) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
     method: "POST",
-    headers: { ...sbHeaders, Prefer: "return=representation" },
+    headers: { ...(await authHeaders()), Prefer: "return=representation" },
     body: JSON.stringify(row),
   });
   if (!res.ok) throw new Error(`Failed to add to ${table}: ${await res.text()}`);
@@ -141,14 +217,14 @@ async function sbInsert(table, row) {
 async function sbUpdate(table, id, patch) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
     method: "PATCH",
-    headers: { ...sbHeaders, Prefer: "return=representation" },
+    headers: { ...(await authHeaders()), Prefer: "return=representation" },
     body: JSON.stringify(patch),
   });
   if (!res.ok) throw new Error(`Failed to update ${table}: ${await res.text()}`);
   return res.json();
 }
 async function sbDelete(table, id) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, { method: "DELETE", headers: sbHeaders });
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, { method: "DELETE", headers: await authHeaders() });
   if (!res.ok) throw new Error(`Failed to delete from ${table}`);
 }
 
@@ -247,9 +323,10 @@ function useSupabaseSettings() {
 
 async function uploadDesignPhoto(blob) {
   const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
+  const token = await getAccessToken();
   const res = await fetch(`${SUPABASE_URL}/storage/v1/object/designs/${path}`, {
     method: "POST",
-    headers: { apikey: SUPABASE_ANON_KEY, "Content-Type": "image/jpeg" },
+    headers: { apikey: SUPABASE_ANON_KEY, ...(token ? { Authorization: `Bearer ${token}` } : {}), "Content-Type": "image/jpeg" },
     body: blob,
   });
   if (!res.ok) throw new Error((await res.text()) || "Upload failed");
@@ -1278,8 +1355,6 @@ function InfoEditor({ info, save, onClose }) {
   );
 }
 
-const PASSCODE = "ZiaNisa786";
-
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -1310,9 +1385,14 @@ class ErrorBoundary extends React.Component {
 function LockScreen({ onUnlock }) {
   const [value, setValue] = useState("");
   const [error, setError] = useState(false);
+  const [checking, setChecking] = useState(false);
 
-  const submit = () => {
-    if (value.trim().toLowerCase() === PASSCODE.toLowerCase()) {
+  const submit = async () => {
+    if (!value.trim() || checking) return;
+    setChecking(true);
+    const session = await signIn(value);
+    setChecking(false);
+    if (session) {
       onUnlock();
     } else {
       setError(true);
@@ -1342,37 +1422,35 @@ function LockScreen({ onUnlock }) {
           style={{ fontFamily: "'Work Sans', sans-serif", fontSize: 15, color: INK, background: PAPER, border: `1px solid ${error ? "#A33" : LINE}` }}
         />
         {error && <p style={{ fontFamily: "'Work Sans', sans-serif", fontSize: 12, color: "#A33", marginTop: -12 }}>That's not quite right — try again.</p>}
-        <PrimaryBtn onClick={submit} style={{ width: "100%", justifyContent: "center" }}><Check size={14} /> Unlock</PrimaryBtn>
+        <PrimaryBtn onClick={submit} style={{ width: "100%", justifyContent: "center" }}><Check size={14} /> {checking ? "Checking…" : "Unlock"}</PrimaryBtn>
       </div>
     </div>
   );
 }
 
-const UNLOCK_KEY = "wedding_planner_unlocked";
-
-function getStoredUnlock() {
-  try {
-    return localStorage.getItem(UNLOCK_KEY) === "true";
-  } catch (e) {
-    return false;
-  }
-}
-
-function setStoredUnlock() {
-  try {
-    localStorage.setItem(UNLOCK_KEY, "true");
-  } catch (e) {
-    // localStorage unavailable (e.g. private browsing) — falls back to per-session unlock
-  }
+function LoadingScreen() {
+  return (
+    <div style={{ background: PAPER, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <style>{FONT_IMPORT}</style>
+      <p style={{ fontFamily: "'Work Sans', sans-serif", fontSize: 13, color: INK, opacity: 0.5 }}>Loading…</p>
+    </div>
+  );
 }
 
 function WeddingManager() {
-  const [unlocked, setUnlocked] = useState(getStoredUnlock);
-  const handleUnlock = () => {
-    setStoredUnlock();
-    setUnlocked(true);
-  };
-  if (!unlocked) return <LockScreen onUnlock={handleUnlock} />;
+  const [status, setStatus] = useState("checking"); // "checking" | "locked" | "unlocked"
+
+  useEffect(() => {
+    (async () => {
+      const token = await getAccessToken();
+      setStatus(token ? "unlocked" : "locked");
+    })();
+  }, []);
+
+  const handleUnlock = () => setStatus("unlocked");
+
+  if (status === "checking") return <LoadingScreen />;
+  if (status === "locked") return <LockScreen onUnlock={handleUnlock} />;
   return <WeddingManagerApp />;
 }
 

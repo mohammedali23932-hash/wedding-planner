@@ -451,7 +451,7 @@
     try {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/rsvps`, {
         method: "POST",
-        headers: { ...sbHeaders, Prefer: "return=representation" },
+        headers: sbHeaders,
         body: JSON.stringify({
           guest_name: name,
           attending,
