@@ -96,8 +96,11 @@
     background-size: cover;
     background-position: center 25%;
   }
-  .hero-ornament {
+  .hero-ornament-wrap {
     position: absolute; top: clamp(14px, 3vh, 28px); left: 50%; transform: translateX(-50%);
+  }
+  .hero-ornament {
+    display: block;
     width: min(220px, 55vw); height: auto; color: var(--gold); opacity: 0.85;
   }
   .hero-eyebrow {
@@ -208,7 +211,7 @@
   .story-photo-frame {
     width: 100%;
     max-width: 340px;
-    aspect-ratio: 1006 / 960;
+    aspect-ratio: 800 / 960;
     margin: 0 auto 28px;
     padding: 5px;
     background: linear-gradient(160deg, var(--gold), var(--bronze));
@@ -423,13 +426,15 @@
 </nav>
 
 <section id="home" class="hero">
-  <svg class="hero-ornament fade-up" viewBox="0 0 320 90" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <path d="M10 45 C 60 10, 110 10, 160 45 C 210 80, 260 80, 310 45" stroke="currentColor" stroke-width="1.2"/>
-    <path d="M152 37 L168 37 L168 53 L152 53 Z" stroke="currentColor" stroke-width="1"/>
-    <path d="M160 34 L171 45 L160 56 L149 45 Z" stroke="currentColor" stroke-width="1"/>
-    <path d="M60 45 a8 8 0 1 1 0.01 0" stroke="currentColor" stroke-width="1"/>
-    <path d="M260 45 a8 8 0 1 1 0.01 0" stroke="currentColor" stroke-width="1"/>
-  </svg>
+  <div class="hero-ornament-wrap">
+    <svg class="hero-ornament fade-up" viewBox="0 0 320 90" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M10 45 C 60 10, 110 10, 160 45 C 210 80, 260 80, 310 45" stroke="currentColor" stroke-width="1.2"/>
+      <path d="M152 37 L168 37 L168 53 L152 53 Z" stroke="currentColor" stroke-width="1"/>
+      <path d="M160 34 L171 45 L160 56 L149 45 Z" stroke="currentColor" stroke-width="1"/>
+      <path d="M60 45 a8 8 0 1 1 0.01 0" stroke="currentColor" stroke-width="1"/>
+      <path d="M260 45 a8 8 0 1 1 0.01 0" stroke="currentColor" stroke-width="1"/>
+    </svg>
+  </div>
   <div class="hero-eyebrow fade-up d1">Together with their families</div>
   <h1 class="fade-up d2"><span id="hero-p1">Abdul Rahman</span> <em>weds</em> <span id="hero-p2">Fathimunnisa</span></h1>
   <div class="hero-date mono fade-up d3" id="hero-dates">18 – 21 December 2026</div>
