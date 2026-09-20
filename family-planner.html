@@ -13,6 +13,9 @@
 <style>
   html, body, #root { margin: 0; padding: 0; min-height: 100vh; max-width: 100%; overflow-x: hidden; }
   * { box-sizing: border-box; }
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid #7C2D3B; outline-offset: 2px; border-radius: 2px;
+  }
 </style>
 <script>
   window.addEventListener("error", function (e) {
