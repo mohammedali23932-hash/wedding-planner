@@ -404,18 +404,20 @@ function nextFunction(functions) {
 }
 
 // ---------- Overview ----------
-function Overview({ info, tasks, contacts, timeline, designs, setTab }) {
+function Overview({ info, tasks, contacts, timeline, designs, rsvps, setTab }) {
   const done = tasks.filter((t) => t.done).length;
   const spent = tasks.reduce((s, t) => s + (Number(t.actual) || 0), 0);
   const estimated = tasks.reduce((s, t) => s + (Number(t.estimated) || 0), 0);
   const upcoming = tasks.filter((t) => !t.done).sort((a, b) => (a.dueDate || "9999").localeCompare(b.dueDate || "9999")).slice(0, 5);
   const nf = nextFunction(info.functions);
+  const rsvpGuests = (rsvps || []).reduce((s, r) => s + (Number(r.guest_count) || 0), 0);
 
   const stats = [
     { label: "Tasks done", value: `${done}/${tasks.length}`, icon: ListChecks, tab: "checklist" },
     { label: "Budget spent", value: money(spent), sub: estimated ? `of ${money(estimated)}` : null, icon: Wallet, tab: "budget" },
     { label: "Contacts", value: contacts.length, icon: Users, tab: "contacts" },
     { label: "Design ideas", value: designs.length, icon: ImageIcon, tab: "designs" },
+    { label: "RSVPs", value: (rsvps || []).length, sub: rsvpGuests ? `${rsvpGuests} guests` : null, icon: Mail, tab: "rsvps" },
   ];
 
   return (
@@ -771,6 +773,56 @@ function Contacts({ contacts, save }) {
                   {c.notes && <p style={{ fontFamily: "'Work Sans', sans-serif", fontSize: 12, color: INK, opacity: 0.6, marginTop: 4 }}>{c.notes}</p>}
                 </div>
               )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------- RSVPs (submitted from the public invite site) ----------
+function RSVPs({ rsvps, save }) {
+  const remove = (id) => save(rsvps.filter((r) => r.id !== id));
+  const sorted = [...rsvps].sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
+  const totalGuests = rsvps.reduce((s, r) => s + (Number(r.guest_count) || 0), 0);
+
+  const fmtDate = (d) => {
+    if (!d) return "";
+    try {
+      return new Date(d).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+    } catch (e) {
+      return "";
+    }
+  };
+
+  return (
+    <div>
+      <div className="flex items-center gap-3 flex-wrap mb-5">
+        <div className="px-3 py-1.5 rounded-full text-xs" style={{ fontFamily: "'Work Sans', sans-serif", background: PAPER, border: `1px solid ${LINE}`, color: INK }}>
+          <b style={{ color: WINE }}>{rsvps.length}</b> {rsvps.length === 1 ? "response" : "responses"}
+        </div>
+        <div className="px-3 py-1.5 rounded-full text-xs" style={{ fontFamily: "'Work Sans', sans-serif", background: PAPER, border: `1px solid ${LINE}`, color: INK }}>
+          <b style={{ color: WINE }}>{totalGuests}</b> {totalGuests === 1 ? "guest" : "guests"} confirmed
+        </div>
+      </div>
+
+      {sorted.length === 0 ? (
+        <p style={{ fontFamily: "'Work Sans', sans-serif", fontSize: 13, color: INK, opacity: 0.45 }}>No RSVPs yet — responses from the invite site will show up here.</p>
+      ) : (
+        <div className="grid sm:grid-cols-2 gap-3">
+          {sorted.map((r) => (
+            <div key={r.id} className="p-4 rounded-lg" style={{ background: CARD, border: `1px solid ${LINE}` }}>
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 19, fontWeight: 600, color: INK }}>{r.guest_name || "Guest"}</span>
+                  <div style={{ fontFamily: "'Work Sans', sans-serif", fontSize: 11, color: WINE, marginTop: 2 }}>
+                    {r.guest_count || 1} {(r.guest_count || 1) === 1 ? "guest" : "guests"} · {fmtDate(r.created_at)}
+                  </div>
+                </div>
+                <IconBtn danger title="Delete" onClick={() => remove(r.id)}><Trash2 size={14} /></IconBtn>
+              </div>
+              {r.message && <p style={{ fontFamily: "'Work Sans', sans-serif", fontSize: 12.5, color: INK, opacity: 0.7, marginTop: 8 }}>"{r.message}"</p>}
             </div>
           ))}
         </div>
@@ -1331,11 +1383,12 @@ function WeddingManagerApp() {
   const [timeline, saveTimeline, timelineLoaded, timelineErr] = useSupabaseList("timeline", identity, identity);
   const [designs, saveDesigns, designsLoaded, designsErr] = useSupabaseList("designs", designFromDb, designToDb);
   const [payments, savePayments, paymentsLoaded, paymentsErr] = useSupabaseList("payments", paymentFromDb, paymentToDb);
-  const connectionError = infoErr || tasksErr || contactsErr || timelineErr || designsErr || paymentsErr;
+  const [rsvps, saveRsvps, rsvpsLoaded, rsvpsErr] = useSupabaseList("rsvps", identity, identity);
+  const connectionError = infoErr || tasksErr || contactsErr || timelineErr || designsErr || paymentsErr || rsvpsErr;
   const [tab, setTab] = useState("overview");
   const [editingInfo, setEditingInfo] = useState(false);
 
-  const ready = infoLoaded && tasksLoaded && contactsLoaded && timelineLoaded && designsLoaded && paymentsLoaded;
+  const ready = infoLoaded && tasksLoaded && contactsLoaded && timelineLoaded && designsLoaded && paymentsLoaded && rsvpsLoaded;
 
   const tabs = [
     { id: "overview", label: "Overview", icon: Heart },
@@ -1344,6 +1397,7 @@ function WeddingManagerApp() {
     { id: "budget", label: "Budget", icon: Wallet },
     { id: "timeline", label: "Run Sheet", icon: Clock },
     { id: "designs", label: "Designs", icon: ImageIcon },
+    { id: "rsvps", label: "RSVPs", icon: Mail },
   ];
 
   return (
@@ -1388,12 +1442,13 @@ function WeddingManagerApp() {
 
             {tab === "overview" && editingInfo && <InfoEditor info={info} save={saveInfo} onClose={() => setEditingInfo(false)} />}
 
-            {tab === "overview" && <Overview info={info} tasks={tasks} contacts={contacts} timeline={timeline} designs={designs} setTab={setTab} />}
+            {tab === "overview" && <Overview info={info} tasks={tasks} contacts={contacts} timeline={timeline} designs={designs} rsvps={rsvps} setTab={setTab} />}
             {tab === "checklist" && <Checklist tasks={tasks} save={saveTasks} contacts={contacts} saveContacts={saveContacts} />}
             {tab === "contacts" && <Contacts contacts={contacts} save={saveContacts} />}
             {tab === "budget" && <Budget tasks={tasks} contacts={contacts} payments={payments} savePayments={savePayments} setTab={setTab} />}
             {tab === "timeline" && <Timeline timeline={timeline} save={saveTimeline} functions={info.functions} />}
             {tab === "designs" && <Designs designs={designs} save={saveDesigns} />}
+            {tab === "rsvps" && <RSVPs rsvps={rsvps} save={saveRsvps} />}
           </>
         )}
       </div>
