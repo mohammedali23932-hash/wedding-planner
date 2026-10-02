@@ -155,6 +155,59 @@
     html { scroll-behavior: auto; }
   }
 
+  /* Calligraphy "written in" reveal — clips right-to-left, matching Arabic
+     reading direction, so it looks like the ink is being traced on. */
+  .ink-reveal { clip-path: inset(0 0 0 100%); transition: clip-path 1.6s cubic-bezier(.5,.05,.2,1); }
+  .ink-reveal.is-inked { clip-path: inset(0 0 0 0%); }
+  @media (prefers-reduced-motion: reduce) {
+    .ink-reveal { clip-path: none; transition: none; }
+  }
+
+  /* Self-drawing stroke for the small arch icons (stroke-dasharray/offset set via JS) */
+  .arch-accent path, .thankyou-arch path { transition: stroke-dashoffset 1.3s ease; }
+  @media (prefers-reduced-motion: reduce) {
+    .arch-accent path, .thankyou-arch path { transition: none; }
+  }
+
+  /* ---------- Hero countdown ---------- */
+  .hero-countdown { display: flex; gap: clamp(16px, 4vw, 26px); align-items: flex-start; justify-content: center; }
+  .hero-countdown .cd-unit { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .hero-countdown .cd-num {
+    font-family: 'IBM Plex Mono', monospace; font-size: clamp(20px, 3.6vw, 26px); font-weight: 600;
+    color: var(--wine); min-width: 1.5em; text-align: center; display: inline-block;
+  }
+  .hero-countdown .cd-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); opacity: 0.55; }
+  .hero-countdown .cd-sep { color: var(--gold); opacity: 0.7; font-size: clamp(16px, 3vw, 20px); margin-top: 2px; }
+  .cd-pulse { animation: cdPulse 0.45s ease; }
+  @keyframes cdPulse { 0% { opacity: 0.25; transform: translateY(-5px); } 100% { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .cd-pulse { animation: none; } }
+
+  /* ---------- Schedule connecting line (drawn via JS-computed position) ---------- */
+  .schedule-line {
+    position: absolute; width: 1px;
+    background: linear-gradient(var(--gold), var(--bronze));
+    transform: scaleY(0); transform-origin: top;
+    transition: transform 1.8s cubic-bezier(.3,.7,.2,1);
+    z-index: 0;
+  }
+  .schedule-line.is-drawn { transform: scaleY(1); }
+  @media (prefers-reduced-motion: reduce) { .schedule-line { transition: none; transform: scaleY(1); } }
+
+  /* ---------- RSVP send-off flourish ---------- */
+  .confetti-piece {
+    position: absolute; top: 50%; left: 50%; width: 6px; height: 6px;
+    background: var(--gold); opacity: 0;
+    transform: translate(-50%, -50%) rotate(45deg);
+    animation: confettiDrift 1.3s ease-out forwards;
+    pointer-events: none;
+  }
+  @keyframes confettiDrift {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.4) rotate(45deg); }
+    18% { opacity: 1; }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1) rotate(225deg); }
+  }
+  @media (prefers-reduced-motion: reduce) { .confetti-piece { display: none; } }
+
   /* ---------- Sections ---------- */
   section { padding: clamp(56px, 9vh, 96px) 20px; }
   .section-inner { max-width: 760px; margin: 0 auto; }
@@ -191,8 +244,9 @@
   }
 
   /* ---------- Schedule ---------- */
-  .schedule-list { display: flex; flex-direction: column; gap: 0; }
+  .schedule-list { position: relative; display: flex; flex-direction: column; gap: 0; }
   .schedule-item {
+    position: relative; z-index: 1;
     display: grid; grid-template-columns: 96px 20px 1fr; gap: 4px 18px;
     padding: 22px 0;
     border-top: 1px solid var(--line);
@@ -304,6 +358,7 @@
   .rsvp-error { font-size: 12.5px; color: #A33; margin-top: -8px; margin-bottom: 14px; }
 
   .thankyou {
+    position: relative;
     text-align: center; padding: 20px 0;
     opacity: 0; transform: translateY(10px) scale(0.98);
   }
@@ -389,7 +444,8 @@
   (function () {
     var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     var intro = document.getElementById("book-intro");
-    if (reduce) { intro.classList.add("done"); return; }
+    function startInk() { if (window.triggerInkReveals) window.triggerInkReveals(); }
+    if (reduce) { intro.classList.add("done"); startInk(); return; }
     document.documentElement.classList.add("intro-lock");
     function openBook() {
       setTimeout(function () {
@@ -397,6 +453,7 @@
         setTimeout(function () {
           intro.classList.add("done");
           document.documentElement.classList.remove("intro-lock");
+          startInk();
         }, 1550);
       }, 2300);
     }
@@ -414,7 +471,7 @@
 </svg>
 
 <div class="bismillah-band">
-  <img class="bismillah-img" src="images/bismillah-calligraphy.png" alt="Bismillah — In the name of Allah, the Most Gracious, the Most Merciful" />
+  <img class="bismillah-img ink-reveal" id="bismillah-img" src="images/bismillah-calligraphy.png" alt="Bismillah — In the name of Allah, the Most Gracious, the Most Merciful" />
   <div class="bismillah-translation">In the name of Allah, the Most Gracious, the Most Merciful</div>
 </div>
 
@@ -438,7 +495,14 @@
   <div class="hero-eyebrow fade-up d1">Together with their families</div>
   <h1 class="fade-up d2"><span id="hero-p1">Abdul Rahman</span> <em>weds</em> <span id="hero-p2">Fathimunnisa</span></h1>
   <div class="hero-date mono fade-up d3" id="hero-dates">18 – 21 December 2026</div>
-  <img class="hero-inshallah-img fade-up d3" src="images/inshallah-calligraphy.png" alt="InshaAllah" />
+  <div class="hero-countdown fade-up d3" id="hero-countdown" hidden>
+    <div class="cd-unit"><span class="cd-num" id="cd-days">–</span><span class="cd-label">Days</span></div>
+    <span class="cd-sep">·</span>
+    <div class="cd-unit"><span class="cd-num" id="cd-hours">–</span><span class="cd-label">Hours</span></div>
+    <span class="cd-sep">·</span>
+    <div class="cd-unit"><span class="cd-num" id="cd-mins">–</span><span class="cd-label">Minutes</span></div>
+  </div>
+  <img class="hero-inshallah-img ink-reveal" id="inshallah-img" src="images/inshallah-calligraphy.png" alt="InshaAllah" />
   <a class="hero-venue fade-up d3" id="hero-venue" href="https://maps.app.goo.gl/33m9TEmMai44iKSx5" target="_blank" rel="noreferrer">Ramesh Convention Centre / Officers Club</a>
   <a href="#rsvp" class="hero-cta fade-up d4">Reserve your spot ✓</a>
 </section>
@@ -527,6 +591,7 @@
   const SUPABASE_URL = "https://cqzaehjqwvxeyrhhksgb.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_FkDiU5XPBwhqOAoNouK76A_AB_B9g5V";
   const sbHeaders = { apikey: SUPABASE_ANON_KEY, "Content-Type": "application/json" };
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const FUNCTION_INFO = {
     "Haldi": "Quran Khani, followed by the Haldi ceremony.",
@@ -550,6 +615,121 @@
     return dt.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
   }
 
+  // ---------- Calligraphy ink reveal (plays once the book-intro clears) ----------
+  window.triggerInkReveals = function () {
+    document.querySelectorAll(".ink-reveal").forEach((el) => el.classList.add("is-inked"));
+  };
+  // The book-intro script (which calls this) runs before this script does, so its
+  // reduced-motion branch (synchronous, no setTimeout) fires before this function
+  // even exists. Catch up immediately for that case; the normal path's delayed
+  // setTimeout call reaches a function that's long since defined by then.
+  if (reduceMotion) window.triggerInkReveals();
+
+  // ---------- Self-drawing stroke for the small arch icons ----------
+  function setupStrokeDraws() {
+    document.querySelectorAll(".arch-accent path, .thankyou-arch path").forEach((path) => {
+      try {
+        const len = path.getTotalLength();
+        path.style.strokeDasharray = len;
+        path.style.strokeDashoffset = reduceMotion ? 0 : len;
+      } catch (e) { /* path not rendered yet — skip */ }
+    });
+    if (reduceMotion) return;
+    const archObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const path = entry.target.querySelector("path");
+          if (path) path.style.strokeDashoffset = 0;
+          archObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    document.querySelectorAll(".arch-accent").forEach((svg) => archObserver.observe(svg));
+  }
+  setupStrokeDraws();
+
+  // ---------- Live countdown to the first function ----------
+  let weddingTarget = null;
+  let lastCd = { d: null, h: null, m: null };
+  function setCd(id, value, prevValue) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const text = String(value);
+    if (el.textContent !== text) {
+      el.textContent = text;
+      if (prevValue !== null && !reduceMotion) {
+        el.classList.remove("cd-pulse");
+        void el.offsetWidth;
+        el.classList.add("cd-pulse");
+      }
+    }
+  }
+  function tickCountdown() {
+    if (!weddingTarget) return;
+    const diff = weddingTarget - new Date();
+    const el = document.getElementById("hero-countdown");
+    if (diff <= 0) { if (el) el.hidden = true; return; }
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    setCd("cd-days", d, lastCd.d);
+    setCd("cd-hours", h, lastCd.h);
+    setCd("cd-mins", m, lastCd.m);
+    lastCd = { d, h, m };
+  }
+  function startCountdown(dateStr) {
+    weddingTarget = new Date(dateStr + "T00:00:00");
+    const el = document.getElementById("hero-countdown");
+    if (el) el.hidden = false;
+    tickCountdown();
+    setInterval(tickCountdown, 1000);
+  }
+
+  // ---------- Schedule timeline that fills in on scroll ----------
+  function setupScheduleLine() {
+    const list = document.getElementById("schedule-list");
+    const dots = list.querySelectorAll(".schedule-dot");
+    if (dots.length < 2) return;
+    const existing = list.querySelector(".schedule-line");
+    if (existing) existing.remove();
+    const listRect = list.getBoundingClientRect();
+    const firstRect = dots[0].getBoundingClientRect();
+    const lastRect = dots[dots.length - 1].getBoundingClientRect();
+    const line = document.createElement("div");
+    line.className = "schedule-line";
+    line.style.left = (firstRect.left - listRect.left + firstRect.width / 2) + "px";
+    line.style.top = (firstRect.top - listRect.top + firstRect.height / 2) + "px";
+    line.style.height = Math.max(0, lastRect.top - firstRect.top) + "px";
+    list.insertBefore(line, list.firstChild);
+    if (reduceMotion) { line.classList.add("is-drawn"); return; }
+    const lineObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          line.classList.add("is-drawn");
+          lineObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.2 });
+    lineObserver.observe(list);
+  }
+
+  // ---------- RSVP send-off flourish ----------
+  function spawnConfetti(container) {
+    if (reduceMotion) return;
+    const count = 8;
+    for (let i = 0; i < count; i++) {
+      const piece = document.createElement("span");
+      piece.className = "confetti-piece";
+      const angle = (Math.PI * 2 * i) / count + Math.random() * 0.4;
+      const dist = 55 + Math.random() * 40;
+      piece.style.setProperty("--dx", `calc(-50% + ${Math.cos(angle) * dist}px)`);
+      piece.style.setProperty("--dy", `calc(-50% + ${Math.sin(angle) * dist - 30}px)`);
+      piece.style.animationDelay = (Math.random() * 0.15) + "s";
+      container.appendChild(piece);
+      piece.addEventListener("animationend", () => piece.remove());
+    }
+  }
+
   async function loadSettings() {
     try {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/wedding_settings?select=*`, { headers: sbHeaders });
@@ -566,6 +746,7 @@
         const first = formatDate(functions[0].date);
         const last = formatDate(functions[functions.length - 1].date);
         document.getElementById("hero-dates").textContent = functions.length > 1 ? `${first} – ${last}` : first;
+        startCountdown(functions[0].date);
 
         const list = document.getElementById("schedule-list");
         list.innerHTML = functions.map(f => {
@@ -592,13 +773,13 @@
       document.getElementById("schedule-list").innerHTML = '<p style="text-align:center; opacity:0.5; font-size:13px;">Schedule coming soon.</p>';
     } finally {
       observeReveals();
+      setupScheduleLine();
     }
   }
   loadSettings();
 
   // Scroll-triggered reveal for below-the-fold content. Re-run after the schedule
   // list is injected so its dynamically-created items get observed too.
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const revealObserver = reduceMotion ? null : new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
@@ -650,6 +831,7 @@
       const thanksEl = document.getElementById("rsvp-thanks");
       thanksEl.hidden = false;
       requestAnimationFrame(() => thanksEl.classList.add("show"));
+      setTimeout(() => spawnConfetti(thanksEl), 650);
     } catch (err) {
       errorEl.textContent = "Something went wrong sending your RSVP — please try again.";
       errorEl.hidden = false;
